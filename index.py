@@ -3,6 +3,8 @@ import configparser
 
 import pandas as pd
 
+from utils.helper import create_bucket
+
 config = configparser.ConfigParser()
 
 config.read('.env')
@@ -11,12 +13,16 @@ WeServe_aws_access = config['AWS']['WeServe_aws_access']
 
 WeServe_aws_secret = config['AWS']['WeServe_aws_secret']
 
+bucket_name = config['AWS']['bucket_name']
+
+region = config['AWS']['region']
+
 
 # read in raw dataset to pandas and renaming the columns
 
-call_details_dataset = pd.read_csv(r'call_details.csv',header=0,names=['CallID','callDurationsinSec','AgentGradeLeve','CallType','CallEndedbyAgent'])
+call_details_dataset = pd.read_csv(r'call_details.csv',header=0,names=['CallID','callDurationsinSec','AgentGradeLevel','CallType','CallEndedbyAgent'])
 
-call_details_dataset
+print(call_details_dataset)
 
 print('good to go')
 
@@ -113,3 +119,9 @@ call_log['status'] = call_log['status'].apply(convert_to_lower)
 # save the cleaned call log dataset
 
 call_log.to_csv('cleaned_call_log',index=False)
+
+# crate the bucket that houses the datasets
+
+create_bucket(WeServe_aws_access,WeServe_aws_secret,bucket_name,region)
+
+# connect to the database to extract data
